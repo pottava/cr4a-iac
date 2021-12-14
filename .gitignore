@@ -1,0 +1,5 @@
+vars.sh
+.terraform*
+*.tfstate*
+*.tfplan
+terraform-creds.json

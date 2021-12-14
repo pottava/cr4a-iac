@@ -1,0 +1,51 @@
+version: 2.1
+orbs:
+  terraform: circleci/terraform@3.0.0
+jobs:
+  test:
+    executor: terraform/default
+    steps:
+      - checkout
+      - echo ${GCLOUD_PROJECT_ID}
+      - terraform/init:
+          path: ./envs/dev
+          backend_config: bucket=${GCLOUD_PROJECT_ID}-tfstate
+      - terraform/validate:
+          path: ./envs/dev
+      - terraform/plan:
+          path: ./envs/dev
+          var: project_id=${GCLOUD_PROJECT_ID}
+  deploy:
+    executor: terraform/default
+    working_directory: ~/envs/dev
+    steps:
+      - checkout
+      - terraform/init:
+          path: ./envs/dev
+          backend_config: bucket=${GCLOUD_PROJECT_ID}-tfstate
+      - terraform/validate:
+          path: ./envs/dev
+      - terraform/plan:
+          path: ./envs/dev
+          var: project_id=${GCLOUD_PROJECT_ID}
+      - terraform/apply:
+          path: ./envs/dev
+          var: project_id=${GCLOUD_PROJECT_ID}
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test:
+          filters:
+            branches:
+              ignore: main
+  deploy:
+    jobs:
+      - deploy:
+          filters:
+            branches:
+              only: main
+            # branches:
+            #   ignore: /.*/
+            # tags:
+            #   only: /v[0-9]+(\.[0-9]+)*/
