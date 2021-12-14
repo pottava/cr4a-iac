@@ -6,15 +6,14 @@ jobs:
     executor: terraform/default
     steps:
       - checkout
-      - echo ${GCLOUD_PROJECT_ID}
       - terraform/init:
           path: ./envs/dev
-          backend_config: bucket=${GCLOUD_PROJECT_ID}-tfstate
+          backend_config: bucket=clouddeploy-sample-tfstate
       - terraform/validate:
           path: ./envs/dev
       - terraform/plan:
           path: ./envs/dev
-          var: project_id=${GCLOUD_PROJECT_ID}
+          var: project_id=clouddeploy-sample
   deploy:
     executor: terraform/default
     working_directory: ~/envs/dev
@@ -22,15 +21,15 @@ jobs:
       - checkout
       - terraform/init:
           path: ./envs/dev
-          backend_config: bucket=${GCLOUD_PROJECT_ID}-tfstate
+          backend_config: bucket=clouddeploy-sample-tfstate
       - terraform/validate:
           path: ./envs/dev
       - terraform/plan:
           path: ./envs/dev
-          var: project_id=${GCLOUD_PROJECT_ID}
+          var: project_id=clouddeploy-sample
       - terraform/apply:
           path: ./envs/dev
-          var: project_id=${GCLOUD_PROJECT_ID}
+          var: project_id=clouddeploy-sample
 workflows:
   version: 2
   test:
